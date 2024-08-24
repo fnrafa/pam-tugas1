@@ -1,4 +1,7 @@
 {
-  "name": "pam1",
-  "displayName": "pam1"
+  "expo": {
+    "backgroundColor": "#1a202c",
+    "name": "pam1",
+    "slug": "pam"
+  }
 }

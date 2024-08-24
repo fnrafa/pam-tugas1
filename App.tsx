@@ -1,118 +1,56 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, StatusBar, Text, TouchableOpacity, useColorScheme, View} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import tw from 'twrnc';
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    const systemColorScheme = useColorScheme();
+    const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === 'dark');
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    useEffect(() => {
+        const getTheme = async () => {
+            const theme = await AsyncStorage.getItem('theme');
+            if (theme === 'dark') {
+                setIsDarkMode(true);
+            } else {
+                setIsDarkMode(systemColorScheme === 'dark');
+            }
+        };
+        getTheme().then();
+    }, [systemColorScheme]);
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    const toggleTheme = async () => {
+        const newTheme = !isDarkMode;
+        setIsDarkMode(newTheme);
+        await AsyncStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    };
+
+    const backgroundStyle = tw`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} flex-1`;
+
+    return (
+        <SafeAreaView style={backgroundStyle}>
+            <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={isDarkMode ? '#1a202c' : '#f7fafc'}
+            />
+            <View style={tw`flex-1 items-center justify-center`}>
+                <Text style={tw`${isDarkMode ? 'text-white' : 'text-black'} text-2xl font-bold`}>
+                    Fikri Noor Arafah
+                </Text>
+                <Text style={tw`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-lg`}>
+                    225150400111018
+                </Text>
+                <TouchableOpacity
+                    onPress={toggleTheme}
+                    style={tw`mt-6 px-4 py-2 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}
+                >
+                    <Text style={tw`${isDarkMode ? 'text-white' : 'text-black'} text-lg`}>
+                        Toggle {isDarkMode ? 'Light' : 'Dark'} Mode
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
+    );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
